@@ -1,0 +1,14 @@
+:root {
+    /* dots colors */
+    --color-yellow: #ffcf63;
+    --color-red: #ec4c5d;
+    --color-green: #7ac29c;
+    --color-blue: #6f8cc1;
+    --color-purple: #a7537d;
+
+    /* main colors */
+    --color-light: #fff;
+    --color-dark: #333;
+    --color-light-gray: #e5e5e5;
+    --color-mid-gray: #888;
+}

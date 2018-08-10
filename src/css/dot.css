@@ -1,0 +1,45 @@
+.dot {
+	width: 25px;
+	height: 25px;
+	margin: 10px;
+	display: inline-block;
+	z-index: 1;
+	position: absolute;
+	font-size: 40px;
+	line-height: 20px;
+	font-family: 'DejaVuSans';
+}
+
+.dot:active {
+	transform: scale(1.2, 1.2);
+}
+.dot:hover {
+	animation: pulsate 1s ease-out;
+	animation-iteration-count: infinite;
+}
+
+.dot:before {
+	content: '\2B22';
+	font-family: 'DejaVuSans';
+}
+
+.yellow {
+	color: var(--color-yellow);
+}
+
+.red {
+	color:var(--color-red);
+}
+
+.green {
+	color:var(--color-green);
+}
+
+.blue {
+	color: var(--color-blue);
+}
+
+.purple {
+	color: var(--color-purple);
+}
+
