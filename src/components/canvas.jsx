@@ -9,14 +9,36 @@ class CanvasComponent extends Component {
         this.clearLines.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        const { startLineProps: {startX, startY, color}, endLineProps: {endX, endY} } = nextProps;
-        if(startX && startX !== this.props.startLineProps.startX) {
+    componentDidUpdate(prevProps) {
+        const { startLineProps: {startX, startY, color}, endLineProps: {endX, endY} } = this.props;
+        if(startX !== prevProps.startLineProps.startX) {
             this.startDrawLine(startX, startY, color);
         }
-        if(endX && endX !== this.props.endLineProps.endX) {
+        // if(endX !== this.props.endLineProps.endX) {
+        if(endX) {
             this.completeLine(endX, endY);
         }
+        if( startX === null && startY === null) {
+            this.clearLines();
+        }
+
+        return prevProps !== this.props;
+    }
+
+    shouldComponentUpdate(nextProps) {
+        const { startLineProps: {startX, startY, color}, endLineProps: {endX, endY} } = nextProps;
+        if(startX !== this.props.startLineProps.startX) {
+            this.startDrawLine(startX, startY, color);
+        }
+        // if(endX !== this.props.endLineProps.endX) {
+        if(endX) {
+            this.completeLine(endX, endY);
+        }
+        if( startX === null && startY === null) {
+            this.clearLines();
+        }
+
+        return nextProps !== this.props;
     }
 
     startDrawLine(x, y, color) {
@@ -33,7 +55,7 @@ class CanvasComponent extends Component {
         ctx.stroke();
     }
 
-    clearLines(x = 0, y = 0, width = this.canvas.canvas.width, height = this.canvas.canvas.height) {
+    clearLines(x = 0, y = 0, width = this.props.width, height = this.props.height) {
         const ctx = this.getCanvas();        
         ctx.clearRect(x, y, width, height);
     }

@@ -6,7 +6,7 @@ const colors = ['yellow', 'red', 'green', 'blue', 'purple'];
 const DOT_SIZE = 25;
 const DOT_PADDING = 20;
 const TEXT_ADJUSTMENT = 5.5;
-const PADDING_ADJUSTMENT = 20;
+const PADDING_ADJUSTMENT = 30;
 
 class GameBoard extends Component {
     constructor(props) {
@@ -35,6 +35,9 @@ class GameBoard extends Component {
         this.onDotPress.bind(this);
         this.addTargetToGroup.bind(this);
         this.areDotsTheSame.bind(this);
+        this.removeDots.bind(this);
+        this.addDots.bind(this);
+        this.getRandomColor.bind(this);
     }
 
     componentDidMount() {
@@ -50,7 +53,7 @@ class GameBoard extends Component {
 		while (rows) {
 			let colNum = columns;
 			while (colNum > 0) {
-                const color = colors[Math.floor(Math.random() * colors.length)]
+                const color = this.getRandomColor();
                 const style = {
                     top: position.top,
                     left: position.left
@@ -99,20 +102,98 @@ class GameBoard extends Component {
         });
 
         this.addTargetToGroup(e.target);
-        
+        e.preventDefault();
     }
 
     onDotUp(e) {
+        // const dotsAreSame = this.areDotsTheSame(this.state.targetGroup);
+        // console.log('dots are same: ', dotsAreSame);
+        // this.setState({ targetGroup: []});
+        e.preventDefault();
+
+
+        if (this.state.targetGroup.length > 1 && this.state.mouseDown && this.areDotsTheSame(this.state.targetGroup)) {
+            // let msg = Messages.successMessage,
+            //     num = this.targetGroup.length;
+
+            // let isSquare = this.doDotsFormSquare(this.targetGroup),
+            //     squareColor = this.targetGroup[0].className.substring(4);
+
+            // // Update Score
+            // this.updateScore(num);
+
+            // // Remove connected dots
+            this.removeDots(this.state.targetGroup);
+            // this.state.targetGroup.forEach(dot => {
+            //     this.removeDot(dot);
+            // });
+            // this.targetGroup.forEach((removeMe) => {
+            //     this.removeDot(removeMe);
+            // });
+
+            // // Show messasge, if square, remove all of color
+            // if (!isSquare) {
+            //     let success = msg + ' You got ' + num + ' hex dots!'
+            //     this.showSuccessMessage(success);
+            //     this.playSound(Sounds.successSound, 'audio', 1);
+            // } else {
+            //     this.showSuccessMessage(Messages.squareMessage);
+            //     this.playSound(Sounds.squareSound, 'audio', 0, 1500);
+            //     this.removeDotsOfColor(squareColor);
+            // }
+
+        } else {
+            // this.showErrorMessage(Messages.errorMessage);
+            // this.playSound(Sounds.errorSound, 'audio', 0);
+        }
+
         this.setState({
-            mouseDown: false
+            targetGroup: [],
+            mouseDown: false,
+            startLineProps: {
+                startX: null,
+                startY: null,
+                color: null
+            },
+            endLineProps: {
+                endX: null,
+                endY: null
+            }
+        });
+    }
+
+    removeDots(dots) {
+        let updatedDots = [...this.state.dots];
+        dots.forEach(dot => {
+            const index = updatedDots.findIndex(d => {
+                return `${d.style.top}px` === dot.style.top 
+                    && `${d.style.left}px` === dot.style.left;
+            });
+            updatedDots.splice(index, 1);
         });
 
-        const dotsAreSame = this.areDotsTheSame(this.state.targetGroup);
-        console.log('dots are same: ', dotsAreSame);
-        this.setState({ targetGroup: []});
+        this.setState({
+            dots: updatedDots
+        });
+
+        this.addDots(dots);
+    }
+
+    addDots(dots) {
+        const newDots = dots.map(dot => {
+            return { color: this.getRandomColor(), style: { top: dot.style.top, left: dot.style.left } }
+        });
+        this.setState({
+            dots: [...this.state.dots, ...newDots]
+        });
+    }
+
+    getRandomColor() {
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 
     onDotEnter(e) {
+        e.preventDefault();
         if(this.state.mouseDown) {
             const y = e.target.offsetTop + DOT_SIZE/2;
             const x = e.target.offsetLeft + DOT_SIZE/2;
@@ -130,14 +211,23 @@ class GameBoard extends Component {
             } else {
                 if(!this.state.targetGroup.includes(e.target)) {
                     this.addTargetToGroup(e.target);
-                    this.setState({
-                        endLineProps: {
-                            endX: x + TEXT_ADJUSTMENT,
-                            endY: y-1
-                        }
-                    })
                 }
+                this.setState({
+                    endLineProps: {
+                        endX: x + TEXT_ADJUSTMENT,
+                        endY: y-1
+                    }
+                })
             }
+            // if(!this.state.targetGroup.includes(e.target)) {
+            //     this.addTargetToGroup(e.target);
+            //     this.setState({
+            //         endLineProps: {
+            //             endX: x + TEXT_ADJUSTMENT,
+            //             endY: y-1
+            //         }
+            //     })
+            // }
         }
     }
 
@@ -172,7 +262,7 @@ class GameBoard extends Component {
                             onDotUp={(e) => this.onDotUp(e)}
                             onDotPress={() => this.onDotPress(i)} 
                             color={dot.color} 
-                            styleObj={dot.style} 
+                            styleObj={dot.style}
                         />
                     ))}
                     <CanvasComponent 
